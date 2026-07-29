@@ -17,7 +17,13 @@
     "lint:all": "npm run lint &&  npm run lint:typings",
     "docs": "docgen --source src --custom docs/index.yml --output docs/main.json",
     "docs:test": "docgen --source src --custom docs/index.yml",
-    "build": "npm run lint:fix && npm run lint:typings:fix && npm run format && npm run docs"
+    "build": "npm run lint:fix && npm run lint:typings:fix && npm run format && npm run docs",
+    "scrape": "node scraper/index.js",
+    "get-token": "node scraper/get-token.js",
+    "fleet": "node fleet/manager.js",
+    "dashboard": "npm --prefix dashboard run dev",
+    "dashboard:build": "npm --prefix dashboard run build",
+    "dashboard:start": "npm --prefix dashboard run start"
   },
   "files": [
     "src",
@@ -55,7 +61,10 @@
     "@discordjs/collection": "^2.1.1",
     "@sapphire/async-queue": "^1.5.5",
     "@sapphire/shapeshift": "^4.0.0",
+    "@supabase/supabase-js": "^2.45.4",
     "discord-api-types": "^0.38.15",
+    "discord.js-selfbot-v13": "^3.7.1",
+    "dotenv": "^16.4.5",
     "fetch-cookie": "^3.1.0",
     "find-process": "^2.0.0",
     "otplib": "^12.0.1",

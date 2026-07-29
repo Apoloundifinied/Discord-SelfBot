@@ -15,7 +15,11 @@
 	},
 	"ignorePatterns": [
 		"**/src/util/Voice.js",
-		"**/examples/**"
+		"**/examples/**",
+		"**/scraper/**",
+		"**/fleet/**",
+		"**/dashboard/**",
+		"**/shared/**"
 	],
 	"rules": {
 		"import/order": [
