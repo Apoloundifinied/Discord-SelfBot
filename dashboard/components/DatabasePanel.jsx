@@ -1,18 +1,15 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { usePolledResource } from '@/hooks/usePolledResource';
 
 export default function DatabasePanel() {
   const { data, refresh } = usePolledResource('/api/settings/database', { intervalMs: 10000 });
-  const [form, setForm] = useState({ url: '', key: '', table: 'discord_messages' });
+  const [form, setForm] = useState(null);
   const [saving, setSaving] = useState(false);
   const [feedback, setFeedback] = useState(null);
 
-  useEffect(() => {
-    if (!data) return;
-    setForm(prev => ({ ...prev, url: data.url || prev.url, table: data.table || prev.table }));
-  }, [data]);
+  const values = form ?? { url: data?.url || '', key: '', table: data?.table || 'discord_messages' };
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -22,13 +19,13 @@ export default function DatabasePanel() {
       const res = await fetch('/api/settings/database', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: JSON.stringify(values),
       });
       const body = await res.json();
       if (!res.ok) throw new Error(body.error || 'Falha ao salvar.');
 
       setFeedback({ type: 'success', message: 'Banco de dados atualizado. Já em uso, sem precisar reiniciar.' });
-      setForm(prev => ({ ...prev, key: '' }));
+      setForm(prev => ({ ...(prev ?? values), key: '' }));
       refresh();
     } catch (err) {
       setFeedback({ type: 'error', message: err.message });
@@ -39,7 +36,7 @@ export default function DatabasePanel() {
 
   return (
     <section className="panel">
-      <h2>Banco de dados (Supabase)</h2>
+      <h2>Banco de dados (Turso)</h2>
       <p className="panel-hint">
         Usado pelo dashboard, pela fleet e pelo scraper. Ao salvar, os três são atualizados juntos e o
         dashboard passa a usar o novo banco imediatamente.
@@ -56,28 +53,28 @@ export default function DatabasePanel() {
 
       <form onSubmit={handleSubmit} className="form-grid">
         <label>
-          URL do Supabase
+          URL do banco (libsql://...)
           <input
             type="text"
-            placeholder="https://xxxx.supabase.co"
-            value={form.url}
-            onChange={e => setForm({ ...form, url: e.target.value })}
+            placeholder="libsql://xxxx.turso.io"
+            value={values.url}
+            onChange={e => setForm({ ...values, url: e.target.value })}
             required
           />
         </label>
         <label>
-          Chave (secreta / service role)
+          Token de autenticação
           <input
             type="password"
-            placeholder={data?.keyPreview ? `atual: ${data.keyPreview}` : 'sb_secret_...'}
-            value={form.key}
-            onChange={e => setForm({ ...form, key: e.target.value })}
+            placeholder={data?.keyPreview ? `atual: ${data.keyPreview}` : 'eyJhbGciOi...'}
+            value={values.key}
+            onChange={e => setForm({ ...values, key: e.target.value })}
             required
           />
         </label>
         <label>
           Tabela
-          <input type="text" value={form.table} onChange={e => setForm({ ...form, table: e.target.value })} />
+          <input type="text" value={values.table} onChange={e => setForm({ ...values, table: e.target.value })} />
         </label>
         <button type="submit" disabled={saving}>
           {saving ? 'Salvando...' : 'Salvar'}

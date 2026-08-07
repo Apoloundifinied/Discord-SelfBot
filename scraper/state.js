@@ -5,41 +5,28 @@ const path = require('path');
 const { createLogger } = require('../shared/logger');
 
 const log = createLogger('scraper:state');
-const DATA_DIR = path.join(__dirname, 'data');
-const STATE_FILE = path.join(DATA_DIR, 'state.json');
+const dataDirectory = path.join(__dirname, 'data');
+const stateFile = path.join(dataDirectory, 'state.json');
 
-/**
- * Estado persistido por canal, para permitir retomar a raspagem sem repetir
- * trabalho já feito (menos requisições = menos risco de rate limit/ban).
- *
- * Formato:
- * {
- *   "<channelId>": {
- *     "oldest": "<id da mensagem mais antiga já raspada>" | null,
- *     "newest": "<id da mensagem mais nova já raspada>" | null,
- *     "backfillDone": boolean // true quando já chegou ao início do histórico do canal
- *   }
- * }
- */
 class ScraperState {
   constructor() {
-    this.data = this._load();
+    this.data = this.load();
   }
 
-  _load() {
+  load() {
     try {
-      if (fs.existsSync(STATE_FILE)) {
-        return JSON.parse(fs.readFileSync(STATE_FILE, 'utf8'));
-      }
-    } catch (err) {
-      log.warn(`Não foi possível ler ${STATE_FILE}, começando do zero. (${err.message})`);
+      return fs.existsSync(stateFile) ? JSON.parse(fs.readFileSync(stateFile, 'utf8')) : {};
+    } catch (error) {
+      log.warn(`Estado inválido; iniciando do zero. (${error.message})`);
+      return {};
     }
-    return {};
   }
 
   save() {
-    if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
-    fs.writeFileSync(STATE_FILE, JSON.stringify(this.data, null, 2), 'utf8');
+    fs.mkdirSync(dataDirectory, { recursive: true });
+    const temporaryFile = `${stateFile}.tmp`;
+    fs.writeFileSync(temporaryFile, JSON.stringify(this.data, null, 2), 'utf8');
+    fs.renameSync(temporaryFile, stateFile);
   }
 
   get(channelId) {
@@ -48,7 +35,6 @@ class ScraperState {
 
   set(channelId, partial) {
     this.data[channelId] = { ...this.get(channelId), ...partial };
-    // Salva incrementalmente: se o processo for interrompido, não perdemos o progresso.
     this.save();
   }
 }

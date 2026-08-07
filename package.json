@@ -1,98 +1,50 @@
 {
-  "name": "discord.js-selfbot-v13",
-  "version": "3.7.1",
-  "description": "An unofficial discord.js fork for creating selfbots",
-  "main": "./src/index.js",
-  "types": "./typings/index.d.ts",
+  "name": "discord-message-collector",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Coleta histórica e em tempo real de mensagens Discord para Turso (libsql).",
   "scripts": {
-    "all": "npm run build && npm publish",
-    "test": "npm run lint:all && npm run docs:test && npm run test:typescript",
-    "fix:all": "npm run lint:fix && npm run lint:typings:fix && npm run format",
-    "test:typescript": "tsc --noEmit && tsd",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "lint:typings": "tslint typings/index.d.ts",
-    "lint:typings:fix": "tslint typings/index.d.ts --fix",
-    "format": "prettier --write src/**/*.js typings/**/*.ts",
-    "lint:all": "npm run lint &&  npm run lint:typings",
-    "docs": "docgen --source src --custom docs/index.yml --output docs/main.json",
-    "docs:test": "docgen --source src --custom docs/index.yml",
-    "build": "npm run lint:fix && npm run lint:typings:fix && npm run format && npm run docs",
+    "test": "node --test test/**/*.test.js",
+    "lint": "eslint scraper fleet shared test licenses scripts void.js doctor.js",
+    "format": "prettier --write scraper fleet shared test licenses scripts void.js doctor.js",
     "scrape": "node scraper/index.js",
     "get-token": "node scraper/get-token.js",
     "fleet": "node fleet/manager.js",
+    "doctor": "node doctor.js",
     "dashboard": "npm --prefix dashboard run dev",
     "dashboard:build": "npm --prefix dashboard run build",
-    "dashboard:start": "npm --prefix dashboard run start"
+    "dashboard:start": "npm --prefix dashboard run start",
+    "license": "node licenses/studio.js",
+    "license:init": "node licenses/studio.js init",
+    "license:create": "node licenses/studio.js create",
+    "key": "node scripts/keygen.js",
+    "keys": "node licenses/studio.js list",
+    "panel": "node licenses/panel.js",
+    "void": "node void.js",
+    "start": "node void.js",
+    "package:client": "node scripts/package-client.js",
+    "package:portable": "node scripts/package-client.js --portable",
+    "sell": "node scripts/sell.js",
+    "test:client": "node scripts/test-client.js",
+    "postinstall": "npm --prefix dashboard install --no-audit --no-fund",
+    "check": "npm run lint && npm test && npm run dashboard:build"
   },
-  "files": [
-    "src",
-    "typings"
-  ],
-  "directories": {
-    "lib": "src",
-    "test": "test"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/aiko-chan-ai/discord.js-selfbot-v13.git"
-  },
-  "keywords": [
-    "discord.js",
-    "discord.js v13",
-    "selfbot",
-    "selfbot v13",
-    "djs",
-    "api",
-    "bot",
-    "node",
-    "discord",
-    "client",
-    "discordapp"
-  ],
-  "author": "aiko-chan-ai",
-  "license": "GNU General Public License v3.0",
-  "bugs": {
-    "url": "https://github.com/aiko-chan-ai/discord.js-selfbot-v13/issues"
-  },
-  "homepage": "https://github.com/aiko-chan-ai/discord.js-selfbot-v13#readme",
-  "dependencies": {
-    "@discordjs/builders": "^1.6.3",
-    "@discordjs/collection": "^2.1.1",
-    "@sapphire/async-queue": "^1.5.5",
-    "@sapphire/shapeshift": "^4.0.0",
-    "@supabase/supabase-js": "^2.45.4",
-    "discord-api-types": "^0.38.15",
-    "discord.js-selfbot-v13": "^3.7.1",
-    "dotenv": "^16.4.5",
-    "fetch-cookie": "^3.1.0",
-    "find-process": "^2.0.0",
-    "otplib": "^12.0.1",
-    "prism-media": "^1.3.5",
-    "qrcode": "^1.5.4",
-    "tough-cookie": "^5.1.2",
-    "tree-kill": "^1.2.2",
-    "undici": "^7.11.0",
-    "werift-rtp": "^0.8.4",
-    "ws": "^8.16.0"
+  "bin": {
+    "void": "void.js"
   },
   "engines": {
     "node": ">=20.18"
   },
+  "dependencies": {
+    "@libsql/client": "^0.17.4",
+    "@node-rs/argon2": "^2.0.2",
+    "discord.js-selfbot-v13": "^3.7.1",
+    "dotenv": "^16.4.5",
+    "tree-kill": "^1.2.2",
+    "debug": "^4.4.0"
+  },
   "devDependencies": {
-    "@discordjs/docgen": "^0.11.1",
-    "@types/debug": "^4.1.12",
-    "@types/node": "^22.10.7",
-    "@types/ws": "^8.5.10",
-    "dtslint": "^4.2.1",
-    "eslint": "^8.39.0",
-    "eslint-config-prettier": "^8.8.0",
-    "eslint-plugin-import": "^2.27.5",
-    "eslint-plugin-prettier": "^4.2.1",
-    "patch-package": "^8.0.0",
-    "prettier": "^2.8.8",
-    "tsd": "^0.32.0",
-    "tslint": "^6.1.3",
-    "typescript": "^5.5.4"
+    "eslint": "^8.57.1",
+    "prettier": "^2.8.8"
   }
 }

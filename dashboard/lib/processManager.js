@@ -16,6 +16,7 @@ export function createProcessSupervisor({ name, scriptPath }) {
   let logs = [];
   let lastStatus = null;
   let exitInfo = null;
+  const messageHandlers = [];
 
   function pushLog(line) {
     logs.push({ ts: Date.now(), line });
@@ -48,7 +49,16 @@ export function createProcessSupervisor({ name, scriptPath }) {
     attachOutput(child.stderr);
 
     child.on('message', msg => {
-      if (msg?.type) lastStatus = msg;
+      // Mensagens de identidade são respostas pontuais, não status do processo:
+      // não devem sobrescrever o último status exibido no painel.
+      if (msg?.type && msg.type !== 'identity-result' && msg.type !== 'identity-error') lastStatus = msg;
+      for (const handler of messageHandlers) {
+        try {
+          handler(msg);
+        } catch {
+          // handlers são observadores: uma falha nunca deve derrubar o supervisor
+        }
+      }
     });
 
     child.on('exit', code => {
@@ -99,5 +109,14 @@ export function createProcessSupervisor({ name, scriptPath }) {
     };
   }
 
-  return { start, stop, send, getState };
+  /** Registra um observador para todas as mensagens IPC recebidas do filho. Retorna unsubscribe. */
+  function onMessage(handler) {
+    if (typeof handler === 'function') messageHandlers.push(handler);
+    return () => {
+      const index = messageHandlers.indexOf(handler);
+      if (index !== -1) messageHandlers.splice(index, 1);
+    };
+  }
+
+  return { start, stop, send, getState, onMessage };
 }

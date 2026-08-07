@@ -1,14 +1,20 @@
 import './globals.css';
+import BackgroundFX from '@/components/BackgroundFX';
+import BrandReveal from '@/components/BrandReveal';
 
 export const metadata = {
-  title: 'Discord Live Monitor',
-  description: 'Painel de mensagens do Discord em tempo real (Supabase)',
+  title: 'HUGGING · Console de Inteligência',
+  description: 'Console local de inteligência do Discord — histórico, tempo real e identidade.',
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="pt-BR">
-      <body>{children}</body>
+      <body>
+        <BackgroundFX />
+        <BrandReveal />
+        {children}
+      </body>
     </html>
   );
 }

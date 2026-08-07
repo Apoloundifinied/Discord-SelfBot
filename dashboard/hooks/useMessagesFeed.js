@@ -27,6 +27,8 @@ export function useMessagesFeed() {
     let timer;
 
     async function poll() {
+      // Aba oculta: pausa o ciclo; o listener de visibilitychange retoma.
+      if (typeof document !== 'undefined' && document.hidden) return;
       try {
         const url = lastIdRef.current
           ? `/api/messages?after=${lastIdRef.current}&limit=200`
@@ -51,10 +53,17 @@ export function useMessagesFeed() {
       }
     }
 
+    function onVisibility() {
+      // Ao voltar para a aba, coleta imediatamente em vez de esperar o próximo ciclo.
+      if (typeof document !== 'undefined' && !document.hidden && !cancelled) poll();
+    }
+
     poll();
+    document.addEventListener('visibilitychange', onVisibility);
     return () => {
       cancelled = true;
       clearTimeout(timer);
+      document.removeEventListener('visibilitychange', onVisibility);
     };
   }, [mergeIncoming]);
 

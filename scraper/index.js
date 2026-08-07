@@ -1,6 +1,6 @@
 'use strict';
 
-const { Client } = require('../src/index');
+const { Client } = require('discord.js-selfbot-v13');
 const config = require('./config');
 const scraper = require('./scraper');
 const { createLogger } = require('../shared/logger');

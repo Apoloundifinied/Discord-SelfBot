@@ -25,15 +25,24 @@ export function usePolledResource(url, { intervalMs = 2500, enabled = true } = {
 
     let cancelled = false;
     const tick = async () => {
-      if (!cancelled) await refresh();
+      // Aba oculta: pula a requisição; o listener de visibilitychange retoma.
+      if (cancelled || (typeof document !== 'undefined' && document.hidden)) return;
+      await refresh();
     };
+
+    function onVisibility() {
+      // Ao voltar para a aba, atualiza na hora em vez de esperar o próximo intervalo.
+      if (!cancelled && typeof document !== 'undefined' && !document.hidden) refresh();
+    }
 
     tick();
     timerRef.current = setInterval(tick, intervalMs);
+    document.addEventListener('visibilitychange', onVisibility);
 
     return () => {
       cancelled = true;
       clearInterval(timerRef.current);
+      document.removeEventListener('visibilitychange', onVisibility);
     };
   }, [refresh, intervalMs, enabled]);
 

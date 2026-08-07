@@ -1,18 +1,21 @@
 {
-  "name": "discord-fleet-dashboard",
-  "version": "0.1.0",
+  "name": "discord-collector-dashboard",
+  "version": "1.0.0",
   "private": true,
-  "description": "Painel single-page para visualizar em tempo real as mensagens coletadas pelo scraper/fleet no Supabase",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "eslint ."
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.45.4",
-    "next": "^14.2.5",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "@libsql/client": "^0.17.4",
+    "next": "^16.2.12",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3"
+  },
+  "devDependencies": {
+    "eslint": "^9.0.0",
+    "eslint-config-next": "^16.2.12"
   }
 }

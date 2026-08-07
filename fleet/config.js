@@ -1,60 +1,21 @@
 'use strict';
 
-require('dotenv').config({ path: require('path').join(__dirname, '.env') });
+const path = require('path');
+const { boolean, integer, list, loadEnv } = require('../shared/config');
 
-function int(name, fallback) {
-  const raw = process.env[name];
-  if (raw === undefined || raw === '') return fallback;
-  const n = Number(raw);
-  return Number.isFinite(n) ? n : fallback;
-}
-
-function bool(name, fallback) {
-  const raw = process.env[name];
-  if (raw === undefined || raw === '') return fallback;
-  return raw === 'true' || raw === '1';
-}
-
-function list(name) {
-  const raw = process.env[name];
-  if (!raw) return [];
-  return raw
-    .split(',')
-    .map(s => s.trim())
-    .filter(Boolean);
-}
+loadEnv(__dirname);
 
 module.exports = {
-  // Supabase (mesma tabela discord_messages usada pelo scraper de histórico)
-  supabaseUrl: process.env.SUPABASE_URL,
-  supabaseKey: process.env.SUPABASE_KEY,
-  supabaseTable: process.env.SUPABASE_TABLE || 'discord_messages',
-
-  // Modo recomendado: lista de IDs de servidores que as contas JÁ participam.
-  // Cada instância só escuta os servidores desta lista dos quais ela já é membro
-  // (nenhuma tentativa de entrar via convite, então não há risco de captcha).
+  tursoUrl: process.env.TURSO_DATABASE_URL?.trim(),
+  tursoAuthToken: process.env.TURSO_AUTH_TOKEN?.trim(),
+  tursoTable: process.env.TURSO_TABLE?.trim() || 'discord_messages',
   guildIds: list('GUILD_IDS'),
-
-  // Modo legado/opcional: convite de um servidor para a conta tentar entrar
-  // automaticamente caso ainda não seja membro (pode exigir captcha, que a lib
-  // não resolve sozinha — use o modo GUILD_IDS acima para evitar isso).
-  guildInvite: process.env.GUILD_INVITE,
-
-  // Opcional: restringe quais canais são ouvidos (vazio = todos os visíveis no servidor)
   channelIds: list('CHANNEL_IDS'),
-
-  // Anti-ban: espera aleatória antes de cada instância entrar no servidor,
-  // evitando que várias contas entrem "ao mesmo tempo" (padrão suspeito).
-  minJoinDelayMs: int('MIN_JOIN_DELAY_MS', 5000),
-  maxJoinDelayMs: int('MAX_JOIN_DELAY_MS', 20000),
-
-  // Ignorar mensagens de outros bots
-  ignoreBots: bool('IGNORE_BOTS', true),
-
-  // Gerenciamento de processos (manager.js)
-  restartDelayMs: int('RESTART_DELAY_MS', 15000),
-  maxRestartsPerAccount: int('MAX_RESTARTS_PER_ACCOUNT', 3),
-
-  // Arquivo com a lista de contas (label + token)
-  accountsFile: process.env.ACCOUNTS_FILE || require('path').join(__dirname, 'accounts.json'),
+  ignoreBots: boolean('IGNORE_BOTS', true),
+  insertBatchSize: integer('INSERT_BATCH_SIZE', 50, { min: 1, max: 1000 }),
+  insertFlushMs: integer('INSERT_FLUSH_MS', 1000, { min: 100, max: 60000 }),
+  restartDelayMs: integer('RESTART_DELAY_MS', 15000, { min: 0, max: 300000 }),
+  maxRestartsPerAccount: integer('MAX_RESTARTS_PER_ACCOUNT', 3, { min: 0, max: 20 }),
+  accountsFile: process.env.ACCOUNTS_FILE?.trim() || path.join(__dirname, 'accounts.json'),
+  trackingLoopSeconds: integer('TRACKING_LOOP_SECONDS', 60, { min: 10, max: 3600 }),
 };

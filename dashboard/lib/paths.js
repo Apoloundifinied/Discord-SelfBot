@@ -12,4 +12,13 @@ export const PATHS = {
   fleetEntry: path.join(REPO_ROOT, 'fleet', 'manager.js'),
   fleetAccounts: path.join(REPO_ROOT, 'fleet', 'accounts.json'),
   dashboardEnvLocal: path.join(DASHBOARD_ROOT, '.env.local'),
+  // Banco local (modo zero-config): arquivo SQLite dentro da aplicação.
+  dataDir: path.join(REPO_ROOT, 'data'),
+  localDbPath: path.join(REPO_ROOT, 'data', 'void.db'),
+  // Licenciamento (dono): licencesDir contém o cofre cifrado + chave pública.
+  licensesDir: path.join(REPO_ROOT, 'licenses'),
+  licensePublicPem: path.join(REPO_ROOT, 'licenses', 'public.pem'),
+  licenseStudio: path.join(REPO_ROOT, 'licenses', 'studio.js'),
+  // Ativação local da instalação (máquina do cliente). Nunca é enviada para fora.
+  licenseActivation: path.join(REPO_ROOT, 'licenses', 'activation.json'),
 };

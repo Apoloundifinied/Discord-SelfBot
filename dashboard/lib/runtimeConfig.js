@@ -1,11 +1,11 @@
-// Estado de configuração do Supabase em memória. Inicializado a partir de
+// Estado de configuração do Turso em memória. Inicializado a partir de
 // dashboard/.env.local no boot, mas pode ser atualizado em tempo real pela rota
 // /api/settings/database — assim não é preciso reiniciar o servidor Next.js
 // para trocar de banco de dados.
 let state = {
-  supabaseUrl: process.env.SUPABASE_URL || '',
-  supabaseKey: process.env.SUPABASE_KEY || '',
-  supabaseTable: process.env.SUPABASE_TABLE || 'discord_messages',
+  tursoUrl: process.env.TURSO_DATABASE_URL || '',
+  tursoAuthToken: process.env.TURSO_AUTH_TOKEN || '',
+  tursoTable: process.env.TURSO_TABLE || 'discord_messages',
 };
 
 export function getRuntimeConfig() {

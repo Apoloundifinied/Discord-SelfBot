@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { usePolledResource } from '@/hooks/usePolledResource';
 import LogViewer from '@/components/LogViewer';
 
@@ -11,18 +11,11 @@ export default function ScraperPanel() {
   const { data: control, refresh: refreshControl } = usePolledResource('/api/scraper/control', {
     intervalMs: 2000,
   });
-  const [form, setForm] = useState({ guildIds: '', channelIds: '', token: '' });
+  const [form, setForm] = useState(null);
   const [busy, setBusy] = useState(false);
   const [feedback, setFeedback] = useState(null);
 
-  useEffect(() => {
-    if (!settings) return;
-    setForm(prev => ({
-      ...prev,
-      guildIds: settings.guildIds ?? prev.guildIds,
-      channelIds: settings.channelIds ?? prev.channelIds,
-    }));
-  }, [settings]);
+  const values = form ?? { guildIds: settings?.guildIds || '', channelIds: settings?.channelIds || '', token: '' };
 
   async function handleSave(event) {
     event.preventDefault();
@@ -32,13 +25,13 @@ export default function ScraperPanel() {
       const res = await fetch('/api/settings/scraper', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: JSON.stringify(values),
       });
       const body = await res.json();
       if (!res.ok) throw new Error(body.error || 'Falha ao salvar.');
 
       setFeedback({ type: 'success', message: 'Configuração salva.' });
-      setForm(prev => ({ ...prev, token: '' }));
+      setForm(prev => ({ ...(prev ?? values), token: '' }));
       refreshSettings();
     } catch (err) {
       setFeedback({ type: 'error', message: err.message });
@@ -86,21 +79,21 @@ export default function ScraperPanel() {
           IDs de servidor (separados por vírgula)
           <input
             type="text"
-            value={form.guildIds}
-            onChange={e => setForm({ ...form, guildIds: e.target.value })}
+            value={values.guildIds}
+            onChange={e => setForm({ ...values, guildIds: e.target.value })}
             placeholder="589505947702001666"
           />
         </label>
         <label>
           IDs de canal (opcional — vazio raspa o servidor inteiro)
-          <input type="text" value={form.channelIds} onChange={e => setForm({ ...form, channelIds: e.target.value })} />
+          <input type="text" value={values.channelIds} onChange={e => setForm({ ...values, channelIds: e.target.value })} />
         </label>
         <label>
           Token da conta {settings?.hasToken ? `(atual: ${settings.tokenPreview}, deixe em branco para manter)` : ''}
           <input
             type="password"
-            value={form.token}
-            onChange={e => setForm({ ...form, token: e.target.value })}
+            value={values.token}
+            onChange={e => setForm({ ...values, token: e.target.value })}
             placeholder="token da conta"
           />
         </label>

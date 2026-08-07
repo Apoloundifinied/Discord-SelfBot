@@ -2,7 +2,7 @@
 
 const config = require('./config');
 const state = require('./state');
-const { insertMessages } = require('./supabaseClient');
+const { insertMessages } = require('./tursoClient');
 const { randomDelay, isRateLimitError } = require('../shared/utils');
 const { createLogger } = require('../shared/logger');
 
@@ -50,6 +50,7 @@ function messageToRow(message) {
   const channel = message.channel;
 
   return {
+    message_id: message.id,
     author_name: message.author?.tag ?? message.author?.username ?? 'unknown',
     message_content: message.content ?? '',
     source_info: {
@@ -65,7 +66,7 @@ function messageToRow(message) {
   };
 }
 
-/** Envia as linhas para o Supabase em lotes, para não estourar o payload de uma vez. */
+/** Envia as linhas para o Turso em lotes, para não estourar o payload de uma vez. */
 async function flushRows(rows) {
   for (let i = 0; i < rows.length; i += config.insertBatchSize) {
     const batch = rows.slice(i, i + config.insertBatchSize);
@@ -119,7 +120,10 @@ async function scrapeChannel(channel, guildLabel) {
   log.info(`Iniciando ${label} — modo: ${channelState.backfillDone ? 'incremental' : 'histórico'}`);
 
   while (fetchedThisRun < config.maxMessagesPerChannelPerRun || config.maxMessagesPerChannelPerRun === 0) {
-    const query = { limit: config.messagesPerRequest };
+    const remaining = config.maxMessagesPerChannelPerRun === 0
+      ? config.messagesPerRequest
+      : Math.min(config.messagesPerRequest, config.maxMessagesPerChannelPerRun - fetchedThisRun);
+    const query = { limit: remaining };
 
     if (!channelState.backfillDone) {
       if (channelState.oldest) query.before = channelState.oldest;

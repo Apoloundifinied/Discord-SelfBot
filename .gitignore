@@ -1,0 +1,27 @@
+node_modules/
+.next/
+coverage/
+.env
+.env.*
+!.env.example
+fleet/accounts.json
+scraper/data/state.json
+# Banco local do modo zero-config (cliente)
+data/
+*.log
+*.tsbuildinfo
+
+# Licenciamento — segredos do DONO (nunca versionar nem distribuir)
+licenses/private.pem.enc
+licenses/keys.json.enc
+licenses/activation.json
+# licenses/public.pem É VERSIONADA: é a única peça que viaja com o produto.
+
+# Pacote distribuível gerado pelo empacotador
+dist/
+
+# Sandbox temporário de testes do cofre (nunca versionar cópias de chaves)
+.tmp-sandbox/
+
+# Cache do Node portátil baixado pelo empacotador (scripts/vendor/)
+scripts/vendor/
